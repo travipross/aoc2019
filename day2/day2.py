@@ -19,8 +19,8 @@ def run_program(vals, input_1, input_2):
     
     return vals[0]
 
-def part1(vals):
-    return run_program(vals, 12, 2)
+def part1(vals, input_1, input_2):
+    return run_program(vals, input_1, input_2)
 
 def part2(vals, target):
     for i in range(100):
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     with open(os.path.join(os.path.dirname(__file__), 'input.txt')) as f:
         vals = list(map(int, f.read().split(',')))
     
-    a = part1(vals.copy())
+    a = part1(vals.copy(), 12, 2)
     print("Part 1 answer: {}".format(a))
 
     b = part2(vals.copy(), 19690720)
