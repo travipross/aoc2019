@@ -4,13 +4,7 @@ import re
 def part1(wires):
     # lay out wires and note all points covered on grid
     start_point = [0, 0]
-    points_visited = [[], []]
-    for idx, wire in enumerate(wires):
-        points_visited[idx] = [start_point]
-        for instruction in wire:
-            next_segment = get_next_segment(points_visited[idx][-1], instruction)
-            points_visited[idx].extend(next_segment)
-        points_visited[idx] = [tuple(pt) for pt in points_visited[idx]]
+    points_visited = [ follow_path(start_point, wire) for wire in wires ]
 
     # get common points in lists
     common_points = get_common_points(start_point, *points_visited)
@@ -19,12 +13,27 @@ def part1(wires):
     min_dist = 1e9
     for pt in common_points:
         new_dist = manhattan_dist(start_point, pt)
-        min_dist = new_dist if new_dist < min_dist else min_dist
+        min_dist = min(new_dist, min_dist)
     
     return min_dist
 
-def part2():
-    pass
+def part2(wires):
+    # lay out wires and note all points covered on grid
+    start_point = [0, 0]
+    points_visited = [ follow_path(start_point, wire) for wire in wires ]
+
+    # get common points in lists
+    common_points = get_common_points(start_point, *points_visited)
+
+    # find total length of wire up to intersection by adding the index at which the intersection occurs on each wire
+    min_steps = 1e9
+    for pt in common_points:
+        steps = 0
+        for pointpath in points_visited:
+            steps += pointpath.index(pt)
+        min_steps = min(steps, min_steps)
+    
+    return min_steps
 
 
 def manhattan_dist(p1, p2):
@@ -58,12 +67,21 @@ def get_next_segment(start_point, instruction):
     return segment
 
 def follow_path(start_point, instructions):
-    visited_points = []
-    return visited_points
-
+    points_visited = [start_point]
+    for instruction in instructions:
+        next_segment = get_next_segment(points_visited[-1], instruction)
+        points_visited.extend(next_segment)
+    points_visited = [tuple(pt) for pt in points_visited]
+    return points_visited
 
 def get_common_points(start_pt, pts1, pts2):
-    return list(set.intersection(set(pts1), set(pts2).symmetric_difference({(0,0)})))
+    # convert lists of point tuples to sets, then take intersection
+    common_set = set.intersection(set(pts1), set(pts2))
+
+    # remove start point from set (always common)
+    common_set_no_start = common_set.symmetric_difference({tuple(start_pt)})
+    
+    return list(common_set_no_start)
 
 
 if __name__ == "__main__":
@@ -72,3 +90,6 @@ if __name__ == "__main__":
 
     a = part1(wires)
     print("Part 1: {}".format(a))
+
+    b = part2(wires)
+    print("Part 2: {}".format(b))
